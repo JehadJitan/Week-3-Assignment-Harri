@@ -1,4 +1,6 @@
 //PAGE RELOADING TIMEOUT
+let tempCountry = [];
+let favouritesArray = [];
 
 const refresh = () => {
   setTimeout(() => {
@@ -45,6 +47,21 @@ darkModeAnchor.addEventListener("click", (e) => {
   refresh();
   e.preventDefault();
 });
+
+///
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+  ev.target.appendChild(document.getElementById(data));
+}
 
 //DOM LOAD
 
@@ -138,16 +155,22 @@ const loadEventListeners = () => {
 
 const renderMainPage = (countriesData) => {
   const countries = document.querySelector(".countries");
+  favouritesArray = JSON.parse(localStorage.getItem("favouriteCoutries")) ?? [];
+  renderFavourites();
   let country = countriesData;
   let cardsContainer = "";
 
   Object.entries(country).forEach((item) => {
     cardsContainer += `
-           <div class="card">
-           <a data-name="${item[1].name.common}" class="country-link">
-             <img class="cardImg" src="${item[1].flags.svg}" alt="${
-      item[1].name.common
-    }">
+           <div class="card" id="${
+             item[1].name.common
+           }" ondragstart="dragstartHandler(event);" ondragend="dragendHandler(event);" draggable="true">
+           <a data-name="${
+             item[1].name.common
+           }" class="country-link" draggable="false">
+             <img class="cardImg" src="${
+               item[1].flags.svg
+             }" draggable="false" alt="${item[1].name.common}">
            </a>
           
            <div class="cardBody">
@@ -168,13 +191,107 @@ const renderMainPage = (countriesData) => {
                     <span>${item[1].capital}</span>
                 </li>
                </ul>
-              
+              <div class="starDiv">
+              <span id="starDivContent"><i class="fa-solid fa-star fa-xl"></i></span>
+              </div>
            </div>
            </div>
          `;
     countries.innerHTML = cardsContainer;
+    isFavourite(item[1].name.common);
   });
 };
+
+function renderFavourites() {
+  const favourites = document.querySelector(".favouritesList");
+  let favouritesListContainer = "";
+
+  favouritesArray.forEach((item) => {
+    favouritesListContainer += `
+      <div class="favouriteCountry" id="${item.name}" draggable="true" ondragstart="drag(event)" onClick="removeFavourite(event)">
+      <div class="flagCountry">
+      <img class="favouriteCountryImage" src="${item.flag}" alt="${item.name}">
+        <span class="favouriteCountryName">${item.name}<span>
+        </div>
+        <div class="remove">
+        <span class="removeFavourite"><i class="fa-solid fa-circle-xmark  text-red"></i></span>
+        </div>
+      </div>
+    `;
+  });
+  favourites.innerHTML = favouritesListContainer;
+}
+
+function dragstartHandler(ev) {
+  console.log("dragStart");
+  const dataList = ev.dataTransfer.items;
+  console.log(ev.target.id);
+  dataList.add(ev.target.id, "text/plain");
+  const tempCountry2 = tempCountry.find((country) => {
+    return country.name.common === ev.target.id;
+    // country[1].capital;
+  });
+  console.log(tempCountry2);
+  ev.dataTransfer.setData("countryName", tempCountry2.name.common);
+  ev.dataTransfer.setData("countryFlag", tempCountry2.flags.svg);
+}
+
+function dropHandler(ev) {
+  console.log("Drop");
+  console.log(ev.dataTransfer.getData("countryName"));
+  if (
+    favouritesArray.some(
+      (favourite) => favourite.name === ev.dataTransfer.getData("countryName")
+    )
+  ) {
+    return;
+  }
+  favouritesArray.push({
+    name: ev.dataTransfer.getData("countryName"),
+    flag: ev.dataTransfer.getData("countryFlag"),
+  });
+  localStorage.setItem("favouriteCoutries", JSON.stringify(favouritesArray));
+  renderFavourites();
+  ev.preventDefault();
+  const data = event.dataTransfer.items;
+}
+
+function dragoverHandler(ev) {
+  console.log("dragOver");
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = "move";
+}
+
+function dragendHandler(ev) {
+  console.log("dragEnd");
+  const dataList = ev.dataTransfer.items;
+  for (let i = 0; i < dataList.length; i++) {
+    dataList.remove(i);
+  }
+  dataList.clear();
+}
+
+function removeFavourite(ev) {
+  const tempCountry2 = tempCountry.find((country) => {
+    return country.name.common === ev.target.id;
+  });
+  let favouriteToRemove = tempCountry2.name.common;
+  let filteredPeople = favouritesArray.filter(
+    (item) => item.name !== favouriteToRemove
+  );
+  favouritesArray = [...filteredPeople];
+  localStorage.setItem("favouriteCoutries", JSON.stringify(favouritesArray));
+  renderFavourites();
+}
+
+function isFavourite(country) {
+  // console.log(favouritesArray);
+  const found = favouritesArray.some((el) => el.name === country);
+  if (found) {
+    console.log(country, "is a favourite and should be yellow stared");
+    document.getElementById("starDivContent").style.color = "oranged";
+  }
+}
 
 //RENDER DETAILED COUNTRY PAGE
 
@@ -285,6 +402,7 @@ const getAllCountries = () => {
     .then(function (response) {
       const countriesData2 = response;
       renderMainPage(countriesData2);
+      tempCountry = response;
     })
     .catch((err) => console.log("Error:", err));
 };

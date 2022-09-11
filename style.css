@@ -134,11 +134,53 @@ nav {
   padding: 0.5rem 1rem;
 }
 
+.mainContainer{
+  display: flex;
+  flex-direction: row;
+}
+
+ #style-1::-webkit-scrollbar-track{
+   -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+   background-color: #F5F5F5;
+   border-color: #121212;
+ }
+ 
+ #style-1::-webkit-scrollbar{
+   width: 10px;
+   background-color: #F5F5F5;
+ }
+ 
+ #style-1::-webkit-scrollbar-thumb{
+   border-radius: 10px;
+   background-color: #c1c1c1;
+   height: 6%;
+ }
+
+.favourites{
+  height:500px;
+  width:22%;
+  margin: 0 0 0 3rem;
+  border-radius: 5px;
+  box-shadow: var(--box-shadow);
+  background-color: var(--elements-color);
+}
+
+.favouritesTitle{
+  padding: 1rem;
+}
+
+.favouritesList{
+  width: 100%;
+  height: 88%;
+  overflow-y: scroll;
+}
+
 .countries {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 4rem;
-  margin: 3rem;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 2rem;
+  max-height: 500px;
+  overflow-y: scroll;
 }
 
 .card {
@@ -146,7 +188,9 @@ nav {
   border-radius: 5px;
   border: 1px solid transparent;
   height: 22rem;
+  width:18rem;
   box-shadow: var(--box-shadow);
+  margin: 0rem 2rem 2rem 1.5rem;
 }
 
 .card:hover {
@@ -233,6 +277,43 @@ nav {
   box-shadow: var(--box-shadow);
 }
 
+.favouriteCountry{
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* background-color: red; */
+
+}
+
+.flagCountry{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.favouriteCountryImage{
+  width: 50px;
+  height: 25px;
+  border-radius: 5px;
+  margin-right: 1rem;
+  object-fit: cover;
+}
+
+.favouriteCountryName{
+  font-weight: 700;
+}
+
+.starDiv{
+  display: none;
+}
+
+.fa-solid{
+  color: #e5e5e5;
+  background-color: black;
+  border-radius: 80%;
+}
+
 @media (max-width: 768px) {
   nav {
     height: 6rem;
@@ -258,10 +339,15 @@ nav {
     width: 100%;
     min-width: 100%;
   }
+
+  .countries::-webkit-scrollbar { 
+    display: none;
+}
   .countries {
     grid-template-columns: repeat(1, 1fr);
     grid-gap: 2rem;
-    margin: 3.5rem;
+    margin: 0 3.5rem 0 3.5rem;
+    overflow-y: scroll;
   }
 
   .country {
@@ -298,9 +384,26 @@ nav {
     margin-top:2rem;
   }
 
-  /* .cardImg {
+  .mainContainer{
+    display: flex;
+    flex-direction: column;
+  }
+  .favourites{
+    display: none;
+  }
+  .card{
     width: 100%;
-    object-fit: cover;
-  } */
+    margin: 0;
+    height: 30rem;
+    margin-bottom: 1rem;
+  }
 
+  .cardImg{
+    height: 15rem;
+  }
+  .starDiv{
+    display:flex;
+    justify-content: end;
+    margin-top: 4rem;
+  }
 }
